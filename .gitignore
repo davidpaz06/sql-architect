@@ -1,0 +1,4 @@
+# Workspaces produced while testing the skill
+*-workspace/
+.DS_Store
+Thumbs.db

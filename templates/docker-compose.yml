@@ -1,0 +1,29 @@
+# docker-compose.yml
+# Local PostgreSQL 18. bootstrap.sql runs once, only when the data volume is empty.
+# Start: docker compose up -d      Reset from scratch: docker compose down -v && docker compose up -d
+services:
+  db:
+    image: postgres:18
+    # When extensions outside the official image are needed (pgvector, PostGIS, pg_cron, pg_partman),
+    # replace "image" with:
+    # build:
+    #   context: .
+    #   dockerfile: docker/db.Dockerfile
+    restart: unless-stopped
+    env_file: .env                      # POSTGRES_*, DB_*_PASSWORD and APP_ENV reach psql via \getenv
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - db-data:/var/lib/postgresql     # PostgreSQL 18 images keep PGDATA under this path
+      - ./bootstrap.sql:/docker-entrypoint-initdb.d/01-bootstrap.sql:ro
+      - ./database:/docker-entrypoint-initdb.d/database:ro   # target of the \ir includes; the entrypoint ignores subfolders
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # Libraries that must be preloaded (pg_stat_statements, pg_cron). Keep the list in one place:
+    # command: ["postgres", "-c", "shared_preload_libraries=pg_stat_statements,pg_cron", "-c", "cron.database_name=${POSTGRES_DB}"]
+
+volumes:
+  db-data:

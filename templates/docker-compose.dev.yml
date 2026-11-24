@@ -1,0 +1,8 @@
+# docker-compose.dev.yml
+# Override that also loads the dev seed on a fresh volume:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+# The seed runs after bootstrap (alphabetical order) and refuses to run unless APP_ENV is development, local or test.
+services:
+  db:
+    volumes:
+      - ./database/seeds/dev.sql:/docker-entrypoint-initdb.d/02-dev-seed.sql:ro

@@ -1,0 +1,5 @@
+-- updated-at.sql
+-- Attaches set_updated_at() to every mutable table. One line per table.
+-- CREATE OR REPLACE TRIGGER trg_users_updated_at
+--   BEFORE UPDATE ON public.users
+--   FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
